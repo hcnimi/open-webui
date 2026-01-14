@@ -852,6 +852,14 @@ ENABLE_OTEL_TRACES = os.environ.get("ENABLE_OTEL_TRACES", "False").lower() == "t
 ENABLE_OTEL_METRICS = os.environ.get("ENABLE_OTEL_METRICS", "False").lower() == "true"
 ENABLE_OTEL_LOGS = os.environ.get("ENABLE_OTEL_LOGS", "False").lower() == "true"
 
+# Granular instrumentor controls (all enabled by default for backwards compatibility)
+ENABLE_OTEL_REDIS = os.environ.get("ENABLE_OTEL_REDIS", "True").lower() == "true"
+ENABLE_OTEL_SQLALCHEMY = os.environ.get("ENABLE_OTEL_SQLALCHEMY", "True").lower() == "true"
+ENABLE_OTEL_REQUESTS = os.environ.get("ENABLE_OTEL_REQUESTS", "True").lower() == "true"
+ENABLE_OTEL_HTTPX = os.environ.get("ENABLE_OTEL_HTTPX", "True").lower() == "true"
+ENABLE_OTEL_AIOHTTP = os.environ.get("ENABLE_OTEL_AIOHTTP", "True").lower() == "true"
+ENABLE_OTEL_LOGGING = os.environ.get("ENABLE_OTEL_LOGGING", "True").lower() == "true"
+
 OTEL_EXPORTER_OTLP_ENDPOINT = os.environ.get(
     "OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317"
 )

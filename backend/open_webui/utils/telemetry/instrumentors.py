@@ -26,6 +26,14 @@ from requests import PreparedRequest, Response
 from sqlalchemy import Engine
 from fastapi import status
 
+from open_webui.env import (
+    ENABLE_OTEL_REDIS,
+    ENABLE_OTEL_SQLALCHEMY,
+    ENABLE_OTEL_REQUESTS,
+    ENABLE_OTEL_HTTPX,
+    ENABLE_OTEL_AIOHTTP,
+    ENABLE_OTEL_LOGGING,
+)
 from open_webui.utils.telemetry.constants import SPAN_REDIS_TYPE, SpanAttributes
 
 
@@ -176,22 +184,34 @@ class Instrumentor(BaseInstrumentor):
 
     def _instrument(self, **kwargs):
         instrument_fastapi(app=self.app)
-        SQLAlchemyInstrumentor().instrument(engine=self.db_engine)
-        RedisInstrumentor().instrument(request_hook=redis_request_hook)
-        RequestsInstrumentor().instrument(
-            request_hook=requests_hook, response_hook=response_hook
-        )
-        LoggingInstrumentor().instrument()
-        HTTPXClientInstrumentor().instrument(
-            request_hook=httpx_request_hook,
-            response_hook=httpx_response_hook,
-            async_request_hook=httpx_async_request_hook,
-            async_response_hook=httpx_async_response_hook,
-        )
-        AioHttpClientInstrumentor().instrument(
-            request_hook=aiohttp_request_hook,
-            response_hook=aiohttp_response_hook,
-        )
+
+        if ENABLE_OTEL_SQLALCHEMY:
+            SQLAlchemyInstrumentor().instrument(engine=self.db_engine)
+
+        if ENABLE_OTEL_REDIS:
+            RedisInstrumentor().instrument(request_hook=redis_request_hook)
+
+        if ENABLE_OTEL_REQUESTS:
+            RequestsInstrumentor().instrument(
+                request_hook=requests_hook, response_hook=response_hook
+            )
+
+        if ENABLE_OTEL_LOGGING:
+            LoggingInstrumentor().instrument()
+
+        if ENABLE_OTEL_HTTPX:
+            HTTPXClientInstrumentor().instrument(
+                request_hook=httpx_request_hook,
+                response_hook=httpx_response_hook,
+                async_request_hook=httpx_async_request_hook,
+                async_response_hook=httpx_async_response_hook,
+            )
+
+        if ENABLE_OTEL_AIOHTTP:
+            AioHttpClientInstrumentor().instrument(
+                request_hook=aiohttp_request_hook,
+                response_hook=aiohttp_response_hook,
+            )
 
     def _uninstrument(self, **kwargs):
         if getattr(self, "instrumentors", None) is None:
